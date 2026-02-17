@@ -12,8 +12,9 @@ router.post('/', async (req, res) => {
             return res.status(400).json({ message: 'No image data provided' });
         }
 
-        // Call the Flask AI Service (Running on port 5002)
-        const aiResponse = await axios.post('http://127.0.0.1:5002/predict', {
+        // Call the Flask AI Service
+        const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://127.0.0.1:5002';
+        const aiResponse = await axios.post(`${aiServiceUrl}/predict`, {
             image: image
         });
 

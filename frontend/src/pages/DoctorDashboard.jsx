@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Calendar, Users, FileText, Settings, Bell, MoreHorizontal } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import API_URL from '../config';
 import '../styles/DoctorDashboard.css';
 
 const DoctorDashboard = () => {
@@ -11,7 +12,7 @@ const DoctorDashboard = () => {
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const response = await fetch('http://localhost:5001/api/patients');
+        const response = await fetch(`${API_URL}/api/patients`);
         const data = await response.json();
         // Since database only holds name/email, we'll mock the condition/threat for now
         const enrichedData = data.map(p => ({

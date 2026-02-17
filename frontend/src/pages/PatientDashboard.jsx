@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Upload, Camera, AlertCircle, CheckCircle2, Loader2, ArrowRight, FileText, XCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import API_URL from '../config';
 import '../styles/PatientDashboard.css';
 import { validateIsSkinImage } from '../utils/imageValidator';
 
@@ -60,7 +61,7 @@ const PatientDashboard = () => {
 
     // 3. Real AI Analysis (Run in parallel with UI)
     try {
-      const response = await fetch('http://localhost:5001/api/analyze', {
+      const response = await fetch(`${API_URL}/api/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image })
