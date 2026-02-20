@@ -529,3 +529,63 @@
         grid-template-columns: 1fr;
     }
 }
+
+.progression-analysis {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.progression-analysis h4 {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.progression-analysis h4::before {
+    content: '';
+    width: 4px;
+    height: 12px;
+    background: var(--primary);
+    border-radius: 2px;
+}
+
+.progression-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+}
+
+.progression-item {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 1rem;
+    border-radius: 10px;
+    border-left: 2px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.progression-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-left-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.p-time {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--primary);
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.p-desc {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: var(--text-muted);
+}

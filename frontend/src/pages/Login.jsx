@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Shield, Mail, Lock, User, ArrowLeft } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import '../styles/Login.css';
 
@@ -46,7 +46,7 @@ const Login = () => {
 
   return (
     <div className="login-page">
-      <motion.div
+      <Motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="login-card glass"
@@ -113,7 +113,7 @@ const Login = () => {
             {isSignup ? ' Login here' : ' Sign up here'}
           </button>
         </div>
-      </motion.div>
+      </Motion.div>
     </div>
   );
 };

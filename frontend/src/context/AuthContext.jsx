@@ -5,7 +5,7 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [onlineUsers, setOnlineUsers] = useState([
+  const [onlineUsers] = useState([
     { id: 101, name: "Sarah Johnson", lastActive: "Just now" },
     { id: 102, name: "Marcus Chen", lastActive: "2 mins ago" }
   ]);
@@ -56,4 +56,5 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);

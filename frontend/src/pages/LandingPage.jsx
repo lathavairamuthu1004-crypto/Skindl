@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shield, Activity, User, UserCheck, ArrowRight } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import '../styles/LandingPage.css';
 
 const LandingPage = () => {
@@ -21,7 +21,7 @@ const LandingPage = () => {
       </nav>
 
       <main className="hero">
-        <motion.div
+        <Motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
@@ -51,7 +51,7 @@ const LandingPage = () => {
               <ArrowRight size={20} className="arrow" />
             </button>
           </div>
-        </motion.div>
+        </Motion.div>
 
         <div className="hero-visual">
           <div className="floating-card glass c1">
