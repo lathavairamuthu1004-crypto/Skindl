@@ -167,43 +167,61 @@ def analyze_image_cv(img_array):
 
     # ACNE BLOBS
     blurred = cv2.medianBlur(gray, 5)
-    circles = cv2.HoughCircles(blurred, cv2.HOUGH_GRADIENT, 1, 12, param1=50, param2=25, minRadius=3, maxRadius=15)
+    # Param2=21 for balanced sensitivity.
+    circles = cv2.HoughCircles(blurred, cv2.HOUGH_GRADIENT, 1, 12, param1=50, param2=21, minRadius=3, maxRadius=15)
     acne_count = len(circles[0]) if circles is not None else 0
 
-    # 3. Decision Matrix (Barrier System)
-    # Standard values
+    # 3. Decision Matrix (Scoring System)
     scores = {
         "Acne Vulgaris": 0,
         "Atopic Dermatitis (Eczema)": 0,
         "Psoriasis": 0,
         "Malignant Melanoma": 0,
-        "Healthy Skin": 50
+        "Healthy Skin": 100
     }
 
-    # CRITICAL: Melanoma Logic (Strong Dark Barrier)
-    # A mole is dark. A rash is not black.
-    if dark_pct > 2.0 and red_pct < 60:
-        scores["Malignant Melanoma"] = 500 + (dark_pct * 10)
+    # CRITICAL: Melanoma Logic (Dark clusters)
+    # A mole/melanoma is primary if it has significant dark pigment.
+    if dark_pct > 0.8:
+        scores["Malignant Melanoma"] = 550 + (dark_pct * 50)
+        # Melanoma rarely presents with widespread acne-like blobs
+        acne_count = max(0, acne_count - 5)
     
-    # CRITICAL: Psoriasis Logic (White Scale Barrier)
-    # Must have lots of redness AND genuine white scales
-    if red_pct > 15 and scale_pct > 1.5:
-        scores["Psoriasis"] = 500 + (scale_pct * 20)
-        # Block Melanoma if psoriasis is likely (scales)
-        scores["Malignant Melanoma"] = 0
+    # CRITICAL: Psoriasis Logic (Red + Thick/Bright Scales)
+    # Stricter: Scales must be very significant (above 12%) and very red.
+    if red_pct > 30 and scale_pct > 12.0:
+        scores["Psoriasis"] = 600 + (scale_pct * 20)
 
-    # CRITICAL: Acne Logic (Blob Barrier)
+    # CRITICAL: Acne Logic (Distinct circular bumps)
+    # Give high baseline and subtract from shared "redness" diseases like Eczema.
     if acne_count >= 2:
-        scores["Acne Vulgaris"] = 400 + (acne_count * 20)
+        scores["Acne Vulgaris"] = 700 + (acne_count * 30)
+    elif acne_count == 1 and red_pct > 15:
+        scores["Acne Vulgaris"] = 450
 
-    # CRITICAL: Eczema Logic (Pure Rash Barrier)
-    # Only if it's mostly red without scales or dark pigment
-    if red_pct > 20 and scale_pct < 1.0 and dark_pct < 1.5 and acne_count < 2:
-        scores["Atopic Dermatitis (Eczema)"] = 450 + (red_pct * 2)
+    # CRITICAL: Eczema Logic (Inflammation/Redness)
+    # High base for Eczema if it's very red.
+    if red_pct > 25:
+        eczema_score = 600 + (red_pct * 4)
+        # If there are many bumps, it's more likely Acne or Psoriasis with scales
+        if acne_count >= 2:
+            eczema_score -= 400
+        if scale_pct > 10.0:
+            eczema_score -= 200
+        scores["Atopic Dermatitis (Eczema)"] = max(0, eczema_score)
 
     # 4. Final Ranking
     total = sum(v for v in scores.values() if v > 0) or 1.0
     final = [{"label": k, "prob": round((v/total)*100, 1)} for k, v in scores.items()]
+    # Mutual exclusion: if Melanoma score is high and Dark pigment exists, dominate.
+    if scores["Malignant Melanoma"] > 550 and dark_pct > 1.5:
+        # Boost Melanoma probability
+        for item in final:
+            if item["label"] == "Malignant Melanoma":
+                item["prob"] = min(98.0, item["prob"] + 20)
+            else:
+                item["prob"] = max(1.0, item["prob"] - 10)
+
     final.sort(key=lambda x: x['prob'], reverse=True)
 
     print(f"DIAGNOSTIC: Red:{red_pct:.1f}% | Dark:{dark_pct:.1f}% | Scale:{scale_pct:.1f}% | Acne:{acne_count} | Result:{final[0]['label']}")

@@ -243,9 +243,29 @@ def main():
     from sklearn.model_selection import train_test_split
     from sklearn.utils.class_weight import compute_class_weight
 
-    x_train, x_val, y_train, y_val = train_test_split(
-        paths, labels, test_size=args.val_split, random_state=args.seed, stratify=labels
-    )
+    # Stratification requires at least one sample per class in the test set.
+    # If test_size < n_classes, scikit-learn will throw a ValueError.
+    n_present = len(present)
+    test_size = args.val_split
+    if isinstance(test_size, float):
+        test_count = int(len(paths) * test_size)
+    else:
+        test_count = int(test_size)
+
+    if test_count < n_present:
+        print(f"--- INFO: Dataset too small for default {args.val_split} split with stratification.")
+        print(f"--- INFO: Adjusting test count from {test_count} to {n_present} (number of classes).")
+        test_count = n_present
+
+    if test_count >= len(paths):
+        print("--- WARNING: Dataset extremely small. Disabling stratification.")
+        x_train, x_val, y_train, y_val = train_test_split(
+            paths, labels, test_size=args.val_split, random_state=args.seed
+        )
+    else:
+        x_train, x_val, y_train, y_val = train_test_split(
+            paths, labels, test_size=test_count, random_state=args.seed, stratify=labels
+        )
 
     class_weights_arr = compute_class_weight(
         class_weight="balanced",
