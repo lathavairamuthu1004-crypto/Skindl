@@ -14,9 +14,11 @@ router.post('/', async (req, res) => {
 
         // Call the Flask AI Service
         const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://127.0.0.1:5002';
-        const aiResponse = await axios.post(`${aiServiceUrl}/predict`, {
-            image: image
-        });
+        const aiResponse = await axios.post(
+            `${aiServiceUrl}/predict`,
+            { image: image },
+            { timeout: 30000 }
+        );
 
         res.json(aiResponse.data);
     } catch (err) {

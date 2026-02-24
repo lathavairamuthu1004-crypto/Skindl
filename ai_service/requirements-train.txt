@@ -1,0 +1,6 @@
+# TensorFlow supports Python 3.9-3.12. If install fails, use Python 3.11:
+#   py -3.11 -m venv .venv  &&  .venv\Scripts\activate
+tensorflow>=2.12
+pandas
+scikit-learn
+Pillow

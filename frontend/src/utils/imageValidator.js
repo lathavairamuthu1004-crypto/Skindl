@@ -45,10 +45,14 @@ export const validateIsSkinImage = (imageSrc) => {
 
             const avgLum = totalLuminance / (scale * scale);
             const stdDev = Math.sqrt(pixelValues.reduce((s, v) => s + Math.pow(v - avgLum, 2), 0) / pixelValues.length);
+            const skinConfidence = skinPixels / (scale * scale);
 
             resolve({
-                isValid: (skinPixels / (scale * scale)) > 0.15,
+                // Avoid rejecting valid photos (dark skin tones, close-up lesions, variable lighting).
+                // The backend can still attempt inference even if this confidence is low.
+                isValid: skinConfidence > 0.02,
                 signatures: {
+                    skinConfidence,
                     redness: redCount / (skinPixels || 1),
                     darkness: darkCount / (skinPixels || 1),
                     texture: stdDev // Variance correlates with scaly conditions

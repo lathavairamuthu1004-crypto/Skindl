@@ -48,9 +48,8 @@ const PatientDashboard = () => {
     // 1. Basic Validation (Keep for speed)
     const validation = await validateIsSkinImage(image);
     if (!validation.isValid) {
-      setAnalyzing(false);
-      setError("AI Input Error: Grad-CAM failed to localize skin. Please re-take the photo.");
-      return;
+      // Don't block analysis on this heuristic; proceed and let backend decide.
+      setProcessingStage('Low skin confidence detected — continuing analysis...');
     }
 
     // 2. UI Animation Sequence
@@ -76,7 +75,7 @@ const PatientDashboard = () => {
         setAnalyzing(false);
         setResult({
           id: "AI-" + Math.floor(Math.random() * 10000),
-          model: "TensorFlow-CNN-v4",
+          model: data.method || "SkinDL AI",
           date: new Date().toLocaleDateString(),
           condition: data.condition,
           confidence: data.confidence,
